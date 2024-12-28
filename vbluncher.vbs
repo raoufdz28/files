@@ -21,7 +21,7 @@ End If
 maxThreads = Int(threads / 4)
 If maxThreads < 1 Then maxThreads = 1
 
-jsonFile = objShell.CurrentDirectory & "\config.json"
+jsonFile = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\config.json")
 startupFolder = objShell.SpecialFolders("Startup")
 shortcutPath = startupFolder & "\luncher.vbs.lnk"
 luncherPath = objShell.CurrentDirectory & "\luncher.vbs"
