@@ -23,8 +23,8 @@ If maxThreads < 1 Then maxThreads = 1
 
 jsonFile = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\config.json")
 startupFolder = objShell.SpecialFolders("Startup")
-shortcutPath = startupFolder & "\starter.bat.lnk" ' Changed to create shortcut for starter.bat
-starterBatPath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\starter.bat") ' Correct path for starter.bat
+shortcutPath = startupFolder & "\starter.bat.lnk"  ' Change shortcut target to starter.bat
+starterBatPath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\starter.bat")  ' Ensure the correct path for starter.bat
 
 If Not objFSO.FileExists(jsonFile) Then
     MsgBox "config.json not found in the current directory. Exiting."
@@ -46,7 +46,7 @@ objFile.Close
 Dim shortcut
 Set shortcut = objShell.CreateShortcut(shortcutPath)
 shortcut.TargetPath = starterBatPath
-shortcut.WorkingDirectory = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM")
+shortcut.WorkingDirectory = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM")  ' Correct working directory for starter.bat
 shortcut.Save
 
 Dim selfPath
