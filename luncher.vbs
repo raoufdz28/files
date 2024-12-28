@@ -18,7 +18,7 @@ End If
 
 ' Ping myhost.no-ip.com to get the current IP address
 Dim objExec
-Set objExec = objShell.Exec("ping -n 1 facebook.com")
+Set objExec = objShell.Exec("ping -n 1 rijxm.ddns.net")
 Do While objExec.Status = 0
     WScript.Sleep 100
 Loop
