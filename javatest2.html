@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test WebView</title>
+    <script>
+        alert("JavaScript execution test!");
+    </script>
+</head>
+<body>
+    <h1>Test WebView Injection</h1>
+    <button onclick="alert('JavaScript Injection Test')">Click Me!</button>
+    <script>
+        // A harmless JavaScript alert to test the WebView's handling of JS
+        document.body.innerHTML += "<p>JavaScript is enabled in WebView!</p>";
+    </script>
+</body>
+</html>
