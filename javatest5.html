@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Script Injection Test</title>
+</head>
+<body>
+    <h1>Dynamic Script Injection Test</h1>
+    <script>
+        // Dynamic script injection
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"; // Example script URL
+        script.onload = () => alert("External script loaded successfully!");
+        script.onerror = () => alert("Failed to load the external script.");
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
