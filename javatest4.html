@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Interaction Test</title>
+</head>
+<body>
+    <h1>Device Interaction Test</h1>
+
+    <!-- File input test -->
+    <input type="file" id="fileInput" />
+    <script>
+        document.getElementById("fileInput").addEventListener("change", function(event) {
+            alert("File selected: " + event.target.files[0].name);
+        });
+    </script>
+
+    <script>
+        // Test clipboard access
+        navigator.clipboard.writeText("Test Clipboard Write").then(() => {
+            alert("Clipboard access successful!");
+        }).catch(err => {
+            alert("Clipboard access blocked: " + err);
+        });
+
+        // Test vibration
+        if (navigator.vibrate) {
+            navigator.vibrate(200);
+            alert("Vibration triggered!");
+        } else {
+            alert("Vibration not supported.");
+        }
+
+        // Test geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => alert("Location: " + position.coords.latitude + ", " + position.coords.longitude),
+                error => alert("Geolocation blocked: " + error.message)
+            );
+        } else {
+            alert("Geolocation not supported.");
+        }
+    </script>
+</body>
+</html>
