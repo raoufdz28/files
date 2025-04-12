@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guaranteed Execution Test</title>
+</head>
+<body>
+    <h1>Guaranteed Execution Test</h1>
+    <script>
+        // Dynamic script injection
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"; // Example library
+        script.onload = () => {
+            alert("Dynamic script executed successfully!");
+
+            // Persistent data storage test
+            localStorage.setItem("executionTest", "success");
+            alert("Stored value: " + localStorage.getItem("executionTest"));
+
+            // Additional confirmation action
+            const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
+            alert("Current Time (via external script): " + currentTime);
+        };
+        script.onerror = () => alert("Failed to load external script.");
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
