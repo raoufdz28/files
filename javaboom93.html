@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch API Test</title>
+</head>
+<body>
+    <h1>Fetch API Test</h1>
+    <button id="sendRequest">Send Request</button>
+    <div id="response" style="margin-top: 20px;"></div>
+
+    <script>
+        document.getElementById("sendRequest").addEventListener("click", () => {
+            const data = { test: "Hello from Fetch API" };
+
+            fetch("https://httpbin.org/post", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    document.getElementById("response").innerHTML = 
+                        `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                    console.log("Fetch API Test Successful:", result);
+                })
+                .catch(error => {
+                    document.getElementById("response").textContent = 
+                        "Error: " + error.message;
+                    console.error("Fetch API Test Error:", error);
+                });
+        });
+    </script>
+</body>
+</html>
