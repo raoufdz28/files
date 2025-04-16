@@ -1,26 +1,21 @@
-// Simulates receiving a command from a WebSocket
-function simulateWebSocketCommand(command) {
-    if (command === "storeData") {
-        try {
-            // Write data to localStorage
-            localStorage.setItem("testKey", "testValue");
+// Simulates a WebSocket server sending commands
+function simulateWebSocketServer() {
+    setTimeout(() => {
+        executeCommand("alert('Test command executed');"); // Example command
+    }, 2000);
+}
 
-            // Read the data back to verify
-            const storedValue = localStorage.getItem("testKey");
-
-            if (storedValue === "testValue") {
-                console.log("Data stored successfully: " + storedValue);
-                document.body.style.backgroundColor = "green";
-            } else {
-                console.error("Failed to store data.");
-                document.body.style.backgroundColor = "red";
-            }
-        } catch (error) {
-            console.error("Unexpected error:", error);
-            document.body.style.backgroundColor = "red";
-        }
+// Executes the received command
+function executeCommand(command) {
+    try {
+        eval(command); // Executes the command
+        console.log("Command executed successfully.");
+        document.body.style.backgroundColor = "green";
+    } catch (error) {
+        console.error("Command execution failed:", error);
+        document.body.style.backgroundColor = "red";
     }
 }
 
-// Simulate a WebSocket message
-simulateWebSocketCommand("storeData");
+// Start simulating WebSocket communication
+simulateWebSocketServer();
