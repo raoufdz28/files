@@ -20,16 +20,12 @@ ws.onmessage = (event) => {
     // Visible RCE Command: Change background color
     document.body.style.backgroundColor = "red";
 
-    // Command to create the file in "Internal storage/Folder 1"
-    const simulatedCommand = "echo 'RCE Test Success' > /storage/emulated/0/Folder 1/rce.txt";
-
-    fetch(`/exec?cmd=${encodeURIComponent(simulatedCommand)}`)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log("Command executed:", result);
-      })
-      .catch((error) => {
-        console.error("Error executing command:", error);
-      });
+    // Command to trigger device vibration
+    if (navigator.vibrate) {
+      navigator.vibrate(1000); // Vibrate for 1 second
+      console.log("Device vibration triggered.");
+    } else {
+      console.error("Vibration API not supported or permission denied.");
+    }
   }
 };
