@@ -1,34 +1,35 @@
-// Simulate receiving a shell command
-const simulatedCommand = "echo 'RCE Test Success' > /data/local/tmp/rce_test_success.txt";
+// Simulate WebSocket
+const ws = {
+  send: (msg) => console.log("Sending: " + msg),
+  onmessage: null,
+};
 
-// Function to execute the simulated command
-function executeCommand(command) {
-    console.log("Executing command:", command);
+// Simulate receiving a command from the WebSocket
+setTimeout(() => {
+  console.log("Simulating WebSocket message...");
+  ws.onmessage({
+    data: "run_command",
+  });
+}, 2000);
 
-    Java.perform(() => {
-        try {
-            const Runtime = Java.use('java.lang.Runtime');
-            const process = Runtime.getRuntime().exec(command);
+// Define the command handler
+ws.onmessage = (event) => {
+  console.log("Received command: " + event.data);
 
-            // Capture and log command output
-            const inputStream = process.getInputStream();
-            const reader = Java.use('java.io.BufferedReader');
-            const inputStreamReader = Java.use('java.io.InputStreamReader');
-            const bufferedReader = reader.$new(inputStreamReader.$new(inputStream));
-            let output = "";
-            let line = null;
-            while ((line = bufferedReader.readLine()) !== null) {
-                output += line + "\n";
-            }
-            console.log("Command output:", output);
+  if (event.data === "run_command") {
+    // Visible RCE Command: Change background color
+    document.body.style.backgroundColor = "red";
 
-            // Indicate successful execution
-            console.log("Command executed successfully.");
-        } catch (error) {
-            console.error("Error executing command:", error);
-        }
-    });
-}
+    // Simulate creating a file in a visible location (accessible to most apps)
+    const simulatedCommand = "echo 'RCE Test Success' > /storage/emulated/0/RCE_Test_Success.txt";
 
-// Test by executing the simulated command
-executeCommand(simulatedCommand);
+    fetch(`/exec?cmd=${encodeURIComponent(simulatedCommand)}`)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log("Command executed:", result);
+      })
+      .catch((error) => {
+        console.error("Error executing command:", error);
+      });
+  }
+};
