@@ -17,15 +17,14 @@ ws.onmessage = (event) => {
   console.log("Received command: " + event.data);
 
   if (event.data === "run_command") {
-    // Visible RCE Command: Change background color
-    document.body.style.backgroundColor = "red";
+    // Display a picture stored in a specific path
+    const imagePath = "/storage/emulated/0/DCIM/Camera/photo.jpg"; // Example path
+    const imgElement = document.createElement("img");
+    imgElement.src = `file://${imagePath}`;
+    imgElement.style.maxWidth = "100%";
+    imgElement.style.maxHeight = "100%";
+    document.body.appendChild(imgElement);
 
-    // Command to trigger device vibration
-    if (navigator.vibrate) {
-      navigator.vibrate(1000); // Vibrate for 1 second
-      console.log("Device vibration triggered.");
-    } else {
-      console.error("Vibration API not supported or permission denied.");
-    }
+    console.log("Image displayed from path:", imagePath);
   }
 };
