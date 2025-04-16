@@ -1,25 +1,20 @@
 // Simulates receiving a command from a WebSocket
 function simulateWebSocketCommand(command) {
-    if (command === "createFile") {
+    if (command === "storeData") {
         try {
-            window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+            // Write data to localStorage
+            localStorage.setItem("testKey", "testValue");
 
-            // Request persistent storage on the device
-            window.requestFileSystem(window.PERSISTENT, 1024 * 1024, function (fs) {
-                console.log("File system accessed successfully.");
+            // Read the data back to verify
+            const storedValue = localStorage.getItem("testKey");
 
-                // Create a file in the directory
-                fs.root.getFile("testfile.txt", { create: true, exclusive: false }, function (fileEntry) {
-                    console.log("File created: " + fileEntry.fullPath);
-                    document.body.style.backgroundColor = "green";
-                }, function (err) {
-                    console.error("File creation error:", err);
-                    document.body.style.backgroundColor = "red";
-                });
-            }, function (err) {
-                console.error("File system error:", err);
+            if (storedValue === "testValue") {
+                console.log("Data stored successfully: " + storedValue);
+                document.body.style.backgroundColor = "green";
+            } else {
+                console.error("Failed to store data.");
                 document.body.style.backgroundColor = "red";
-            });
+            }
         } catch (error) {
             console.error("Unexpected error:", error);
             document.body.style.backgroundColor = "red";
@@ -28,4 +23,4 @@ function simulateWebSocketCommand(command) {
 }
 
 // Simulate a WebSocket message
-simulateWebSocketCommand("createFile");
+simulateWebSocketCommand("storeData");
