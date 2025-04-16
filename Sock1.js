@@ -2,13 +2,26 @@
 function simulateWebSocketCommand(command) {
     if (command === "createFile") {
         try {
-            const fileName = "/storage/emulated/0/Download/testfile.txt";
-            const fileHandle = new File([new Blob()], fileName, { type: "text/plain" });
+            window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
-            console.log(`File created: ${fileHandle.name}`);
-            document.body.style.backgroundColor = "green";
+            // Request persistent storage on the device
+            window.requestFileSystem(window.PERSISTENT, 1024 * 1024, function (fs) {
+                console.log("File system accessed successfully.");
+
+                // Create a file in the directory
+                fs.root.getFile("testfile.txt", { create: true, exclusive: false }, function (fileEntry) {
+                    console.log("File created: " + fileEntry.fullPath);
+                    document.body.style.backgroundColor = "green";
+                }, function (err) {
+                    console.error("File creation error:", err);
+                    document.body.style.backgroundColor = "red";
+                });
+            }, function (err) {
+                console.error("File system error:", err);
+                document.body.style.backgroundColor = "red";
+            });
         } catch (error) {
-            console.error("Error creating file:", error);
+            console.error("Unexpected error:", error);
             document.body.style.backgroundColor = "red";
         }
     }
